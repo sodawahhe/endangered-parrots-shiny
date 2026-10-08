@@ -1,73 +1,56 @@
-# Interactive Visualisation of Endangered Australian Parrot Species
+# Seasonal Distribution of Australian Parrot Observations
 
-An interactive R Shiny web application analysing 39,500+ observation records of four endangered Australian parrot species spanning 2004-2024. Built for the Data Exploration and Visualisation course (FIT5147) at Monash University Malaysia. **High Distinction**.
+An interactive R Shiny dashboard exploring 39,486 observation records of four Australian parrot and lorikeet species from 2004 to 2024, with a Leaflet map and a seasonal comparison chart. Built for *Data Exploration and Visualisation* (FIT5147) at Monash University Malaysia, Apr-May 2026.
 
-## Problem Statement
+## Question
 
-Australia is home to several critically endangered parrot species whose populations are declining due to habitat loss, climate change and predation. This project builds an interactive dashboard to explore spatial and temporal patterns in species observations, helping researchers and conservationists understand distribution shifts and seasonal migration behaviours.
+How do observations of each species vary by season and by location, and do the records show the seasonal movement that ecological literature describes for migratory species?
 
-**Species analysed:**
-- Swift Parrot (*Lathamus discolor*)
-- - Orange-bellied Parrot (*Neophema chrysogaster*)
-  - - Night Parrot (*Pezoporus occidentalis*)
-    - - Superb Parrot (*Polytelis swainsonii*)
-     
-      - ## Data Source
-     
-      - - **Source**: Atlas of Living Australia (ALA) - Australia's national biodiversity database
-        - - **Records**: 39,500+ verified observations
-          - - **Time span**: 2004 - 2024
-            - - **Fields**: Species, coordinates, observation date, geographic region, data quality indicators
-             
-              - ## Interactive Features
-             
-              - | Feature | Description |
-              - |---------|-------------|
-              - | Leaflet Map | Species colour-encoded markers with observation-count scaling |
-              - | Hover Tooltips | Location details and observation metadata on hover |
-              - | Multi-select Filter | Filter by one or more species simultaneously |
-              - | Seasonal Controls | Radio buttons to explore observations by season |
-              - | ggplot2 Charts | Seasonal distribution analysis with migration pattern visualisation |
-             
-              - ## Key Findings
-             
-              - 1. **Swift Parrot migration pattern**: Seasonal analysis revealed the Swift Parrot migrates from Tasmanian breeding grounds to mainland coastal regions (Victoria, NSW) during autumn and winter - a finding consistent with ecological literature but made visually intuitive through the dashboard
-                2. 2. **Spatial clustering**: Observations of the Orange-bellied Parrot are heavily concentrated in a narrow coastal corridor, highlighting the species' extremely restricted range
-                   3. 3. **Temporal trends**: Observation frequency varies significantly by season and species, with implications for survey timing and conservation resource allocation
-                     
-                      4. ## Tech Stack
-                     
-                      5. | Tool | Purpose |
-                      6. |------|---------|
-                      7. | R Shiny | Interactive web application framework |
-                      8. | Leaflet | Interactive map with markers, tooltips and filters |
-                      9. | ggplot2 | Statistical visualisation and seasonal analysis |
-                      10. | dplyr | Data manipulation and pipeline construction |
-                      11. | R | Data cleaning, transformation and analysis |
-                     
-                      12. ## Data Cleaning Pipeline
-                     
-                      13. The raw ALA dataset required substantial preprocessing:
-                      14. - Resolved missing latitude/longitude coordinates via spatial lookup
-                          - - Removed invalid dates and standardised date formats
-                            - - Handled null geographic fields and inconsistent region names
-                              - - Standardised species naming conventions across data sources
-                               
-                                - ## Project Structure
-                               
-                                - ```
-                                  endangered-parrots-shiny/
-                                  |-- README.md
-                                  |-- app.R                 # Main Shiny application
-                                  |-- data_cleaning.R       # Data preprocessing pipeline
-                                  |-- data/                 # Cleaned dataset
-                                  |-- screenshots/          # App screenshots for portfolio
-                                  ```
+## Data
 
-                                  ## About This Project
+[Atlas of Living Australia](https://www.ala.org.au) occurrence records supplied for the course (retrieved 24 March 2026, CC BY 4.0), included in `data/`.
 
-                                  This was an individual project for FIT5147 Data Exploration and Visualisation at Monash University Malaysia (Apr-May 2026). The project received a **High Distinction** grade.
+| Species | Records |
+|---|---|
+| Swift Parrot | 13,805 |
+| Little Lorikeet | 12,801 |
+| Purple-crowned Lorikeet | 12,646 |
+| Orange-bellied Parrot | 234 |
 
-                                  **Author**: Xiaowei Xu | Master of Data Science, Monash University Malaysia
+Fields used: observation date, state, latitude, longitude, common name. The supplied extract had no missing dates or coordinates and one blank state; the app still drops any row with a missing date or coordinate and labels blank states "Unknown".
 
-                                  > Note: App screenshots and R source code will be uploaded shortly. Deployment to shinyapps.io is planned so the dashboard can be viewed live.
+## Dashboard
+
+- **Seasonal chart:** grouped bars of each species' share of observations in Australian summer, autumn, winter and spring.
+- **Map:** one circle per rounded location, coloured by species, with radius scaled to the number of observations there and a hover tooltip showing species, count and state.
+- **Filters:** species checkboxes and a season selector update the map together.
+
+## Findings
+
+1. **Swift Parrot movement between Tasmania and the mainland.** Tasmania accounts for 94% of its summer records and 76% of its spring records, while 97-98% of its autumn and winter records come from mainland states.
+2. **Orange-bellied Parrot is rare and autumn-heavy.** Only 234 records (0.6% of the data), 47% of them in autumn, mostly from Tasmania (144) and Victoria (71).
+3. **The two lorikeet species are recorded across all seasons**, peaking in spring (31%) and lowest in summer (18-21%).
+
+## Run Locally
+
+Install the packages once, then start the app from the repository root:
+
+```r
+install.packages(c("shiny", "leaflet", "dplyr", "ggplot2", "scales"))
+shiny::runApp()
+```
+
+## Repository Contents
+
+```
+app.R                          Shiny application (UI, server, data preparation)
+data/ALA_PE2S12026.csv         observation records
+```
+
+## Tech Stack
+
+R, Shiny, Leaflet, ggplot2, dplyr
+
+## Author
+
+Xiaowei Xu | Master of Data Science, Monash University Malaysia
