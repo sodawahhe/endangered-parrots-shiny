@@ -1,4 +1,4 @@
-# Australian Parrot Observations — Interactive R Shiny Dashboard
+# Australian Parrot Observations: Interactive R Shiny Dashboard
 
 An R Shiny dashboard for exploring where and when four Australian parrot and lorikeet species were recorded between 2004 and 2024, combining a linked Leaflet map with a seasonal comparison chart.
 
@@ -8,7 +8,7 @@ An R Shiny dashboard for exploring where and when four Australian parrot and lor
 
 ## Question
 
-Species observation records are a long list of coordinates and dates — hard to read directly. The dashboard answers two questions visually: **how does each species' activity split across the four seasons**, and **where are those observations on the map** once you filter to a single species or season.
+Species observation records are a long list of coordinates and dates, which is hard to read directly. The dashboard answers two questions visually: **how does each species' activity split across the four seasons**, and **where are those observations on the map** once you filter to a single species or season.
 
 ## Data
 
@@ -43,7 +43,7 @@ Geographic distribution, filterable by species and season:
 
 ## Findings
 
-1. **The Swift Parrot's records shift between Tasmania and the mainland.** Tasmania holds 94% of its summer records and 76% of its spring records, while 97–98% of its autumn and winter records come from mainland states — the breeding-to-wintering movement, visible directly in the data.
+1. **The Swift Parrot's records shift between Tasmania and the mainland.** Tasmania holds 94% of its summer records and 76% of its spring records, while 97–98% of its autumn and winter records come from mainland states. The breeding-to-wintering movement is visible directly in the data.
 2. **The Orange-bellied Parrot is both rare and seasonally concentrated.** 234 records in total, 47% of them in autumn, almost all from Tasmania (144) and Victoria (71).
 3. **The two lorikeets are recorded year-round**, peaking in spring (31%) and dipping in summer (18–21%), consistent with resident rather than migratory species.
 
@@ -56,7 +56,7 @@ shiny::runApp()
 
 The app reads `ALA_PE2S12026.csv` from the repository root.
 
-> **Note on the base map.** The app requests CartoDB Positron tiles, which now require a CARTO API key — without one the tiles render with a watermark. For a key-free base map, swap the provider in `app.R`:
+> **Note on the base map.** The app requests CartoDB Positron tiles, which now require a CARTO API key. Without one the tiles render with a watermark. For a key-free base map, swap the provider in `app.R`:
 > ```r
 > addProviderTiles(providers$OpenStreetMap.Mapnik)
 > ```
