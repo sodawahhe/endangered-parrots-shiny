@@ -1,5 +1,6 @@
-# FIT5147 PE2 - R Shiny Application
-# Author: Xiaowei Xu | Monash University Malaysia
+# FIT5147 PE2 - R Shiny Visualisation
+# Author: Xiaowei Xu
+# Seasonal distribution and geographic mapping of four Australian parrot species
 
 library(shiny)
 library(ggplot2)
@@ -7,9 +8,9 @@ library(leaflet)
 library(dplyr)
 
 # Load data
-bird_data <- read.csv("data/ALA_PE2S12026.csv", stringsAsFactors = FALSE)
+bird_data <- read.csv("ALA_PE2S12026.csv", stringsAsFactors = FALSE)
 
-# Parse dates and extract month/year
+# Parse dates, extract month and year
 bird_data$observationDate <- as.Date(bird_data$observationDate)
 bird_data$month <- as.integer(format(bird_data$observationDate, "%m"))
 bird_data$year <- as.integer(format(bird_data$observationDate, "%Y"))
@@ -18,7 +19,7 @@ bird_data$year <- as.integer(format(bird_data$observationDate, "%Y"))
 bird_data <- bird_data[!is.na(bird_data$month), ]
 bird_data <- bird_data[!is.na(bird_data$decimalLatitude) & !is.na(bird_data$decimalLongitude), ]
 
-# Assign Australian seasons
+# Assign Australian seasons based on month
 bird_data$season <- dplyr::case_when(
   bird_data$month %in% c(12, 1, 2) ~ "Summer",
   bird_data$month %in% c(3, 4, 5)  ~ "Autumn",
@@ -29,7 +30,7 @@ bird_data$season <- dplyr::case_when(
 bird_data$species <- bird_data$vernacularName
 bird_data$stateProvince[bird_data$stateProvince == ""] <- "Unknown"
 
-# Round coordinates to reduce overplotting on the map
+# Round coordinates to reduce overplotting on map
 bird_data$lat_round <- round(bird_data$decimalLatitude, 2)
 bird_data$lon_round <- round(bird_data$decimalLongitude, 2)
 
@@ -76,16 +77,17 @@ ui <- fixedPage(
       div(class = "section-box",
           div(class = "desc-title", "VIS 1: Seasonal Observation Proportions"),
           div(class = "desc-text",
-              "This grouped bar chart shows the proportion of observations in each
-               Australian season (Summer: Dec\u2013Feb, Autumn: Mar\u2013May,
-               Winter: Jun\u2013Aug, Spring: Sep\u2013Nov) for the four parrot species.
-               Bar height represents seasonal proportion, and colour hue distinguishes
-               the four seasons. The Swift Parrot is recorded at similar levels in spring, autumn
-               and winter but rarely in summer (9.9%), consistent with its seasonal
-               movement between Tasmania and the mainland. The Little Lorikeet
-               and Purple-crowned Lorikeet show relatively even distributions across seasons,
-               suggesting year-round residency. The Orange-bellied Parrot is most observed
-               in autumn, consistent with its migration to mainland coastal areas."))
+              "This grouped bar chart shows what proportion of each species\u2019
+               observations fall in each Australian season (Summer: Dec\u2013Feb,
+               Autumn: Mar\u2013May, Winter: Jun\u2013Aug, Spring: Sep\u2013Nov).
+               Bar height represents the seasonal proportion and colour distinguishes
+               the four seasons. The Swift Parrot peaks in autumn, which matches its
+               known post-breeding migration from Tasmania to mainland Australia
+               around March\u2013May. The Little Lorikeet and Purple-crowned Lorikeet
+               are spread fairly evenly across seasons, suggesting they are year-round
+               residents. The Orange-bellied Parrot, a critically endangered species,
+               is most observed in autumn, consistent with its winter migration to
+               coastal Victoria and South Australia."))
     )
   ),
 
@@ -116,27 +118,28 @@ ui <- fixedPage(
   fixedRow(
     column(12,
       div(class = "section-box",
-          div(class = "desc-title", "MAP: Geographic Distribution of Parrot Observations"),
+          div(class = "desc-title", "MAP: Geographic Distribution"),
           div(class = "desc-text",
-              "This interactive map shows each observation location as a circle marker.
-               Colour represents the species and radius reflects the number of observations
-               at that location. Use the checkboxes to filter by species and the radio
-               buttons to filter by season. Hover over a marker for details. The map
-               highlights clear migration patterns: the Swift Parrot clusters in
-               Tasmania during spring (breeding) and shifts to Victoria and NSW in
-               autumn and winter. The Orange-bellied Parrot appears only along a narrow
-               coastal strip in Tasmania, Victoria and South Australia. The two lorikeet species
-               are more widely spread across eastern and southern Australia year-round."))
+              "Each circle marker represents observations at a location. Colour
+               indicates the species and circle size reflects how many observations
+               were recorded there. Use the checkboxes above to show or hide species,
+               and the radio buttons to filter by season. Hover over any marker to
+               see the species name, count, and state. The map reveals clear migration
+               patterns: the Swift Parrot clusters in Tasmania during spring (breeding
+               season) and moves to coastal Victoria and NSW in autumn and winter.
+               The Orange-bellied Parrot is restricted to a narrow coastal strip in
+               Victoria and South Australia. The two lorikeet species are more widely
+               distributed across eastern and southern Australia throughout the year."))
     )
   ),
 
-  # Data source info
+  # Data source
   fixedRow(
     column(12,
       div(class = "data-source",
           tags$strong("Data Source: "),
           "Atlas of Living Australia (ALA). ",
-          tags$em("ALA_PE2S12026.csv"), ". ",
+          tags$em("ALA_S12026PE2.csv"), ". ",
           "Retrieved 24 March 2026 from ",
           tags$a(href = "https://www.ala.org.au", "https://www.ala.org.au",
                  target = "_blank"), ". ",
@@ -151,7 +154,7 @@ ui <- fixedPage(
 # ---- Server ----
 server <- function(input, output, session) {
 
-  # VIS 1: static grouped bar chart
+  # VIS 1: static grouped bar chart (ggplot2)
   output$vis1_plot <- renderPlot({
 
     season_props <- bird_data %>%
@@ -191,7 +194,7 @@ server <- function(input, output, session) {
         plot.margin = margin(10, 15, 10, 10))
   }, res = 110)
 
-  # MAP: filter and aggregate data reactively
+  # MAP: filter and aggregate data
   map_data <- reactive({
     filtered <- bird_data
 
@@ -210,7 +213,7 @@ server <- function(input, output, session) {
       summarise(obs_count = n(), .groups = "drop")
   })
 
-  # Render base map once
+  # Base map (rendered once)
   output$map_plot <- renderLeaflet({
     leaflet() %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
@@ -222,7 +225,7 @@ server <- function(input, output, session) {
         title = "Species", opacity = 0.8)
   })
 
-  # Update circle markers when filters change
+  # Update markers when filters change
   observe({
     df <- map_data()
     proxy <- leafletProxy("map_plot") %>% clearMarkers()
